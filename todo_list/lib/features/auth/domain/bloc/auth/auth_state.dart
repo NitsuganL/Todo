@@ -13,7 +13,8 @@ class AuthState {
       });
 
   factory AuthState.initial() =>
-      const AuthState(stateStatus: StateStatus.initial);
+      const AuthState(
+        stateStatus: StateStatus.initial);
 
   AuthState copyWith({
     StateStatus? stateStatus,

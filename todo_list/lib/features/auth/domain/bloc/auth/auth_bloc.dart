@@ -42,7 +42,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           stateStatus: StateStatus.loaded,
           authUserModel: userModel,
         ));
-        print('success');
       });
     });
     on<AuthRegisterEvent>((event, emit) async {

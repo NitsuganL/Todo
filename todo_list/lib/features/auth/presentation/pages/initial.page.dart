@@ -4,6 +4,8 @@ import 'package:todo_list/core/enum/state_status.enum.dart';
 import 'package:todo_list/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:todo_list/features/auth/presentation/pages/home.dart';
 import 'package:todo_list/features/auth/presentation/pages/login.dart';
+import 'package:todo_list/core/dependency_injection/di_container.dart';
+import 'package:todo_list/features/auth/todo/domain/todo_bloc/todo_bloc.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});
@@ -14,6 +16,7 @@ class InitialPage extends StatefulWidget {
 
 class _InitialPageState extends State<InitialPage> {
   late AuthBloc _authBloc;
+  final DIContainer diContainer = DIContainer();
 
   @override
   void initState() {
@@ -53,12 +56,19 @@ class _InitialPageState extends State<InitialPage> {
         state.stateStatus == StateStatus.loaded) {
       ///proceed to home page
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => BlocProvider.value(
-                    value: _authBloc,
-                    child: const HomePage(),
-                  )));
+        context,
+        MaterialPageRoute(
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider<AuthBloc>(
+                create: (BuildContext context) => diContainer.authBloc
+              ),
+              BlocProvider<TodoBloc>(
+                create: (BuildContext context) => diContainer.todoBloc)
+          ], child: const HomePage()
+          ),
+        ),
+      );
       return;
     }
   }
