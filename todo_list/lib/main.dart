@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_list/core/dependency_injection/di_container.dart';
 import 'package:todo_list/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:todo_list/features/auth/presentation/pages/initial.page.dart';
+import 'package:todo_list/features/auth/todo/domain/todo_bloc/todo_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +33,10 @@ class _MyAppState extends State<MyApp> {
           providers: [
             BlocProvider<AuthBloc>(
               create: (BuildContext context) => diContainer.authBloc,
-            )
+            ),
+            BlocProvider<TodoBloc>(
+                create: (BuildContext context) => diContainer.todoBloc
+            ),
           ],
           child: const InitialPage(),
         ));

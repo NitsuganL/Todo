@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class MyFormPage extends StatefulWidget {
   const MyFormPage({super.key});
 
@@ -9,6 +10,10 @@ class MyFormPage extends StatefulWidget {
 class _MyFormPageState extends State<MyFormPage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Hello this is a form'));
+    return Scaffold(
+      appBar: AppBar(
+        
+      ),
+    );
   }
 }

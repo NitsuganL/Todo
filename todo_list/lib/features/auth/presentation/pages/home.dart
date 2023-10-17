@@ -5,6 +5,8 @@ import 'package:todo_list/core/global_widgets/snackbar.widget.dart';
 import 'package:todo_list/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:todo_list/features/auth/presentation/pages/login.dart';
 import 'package:todo_list/features/auth/todo/domain/models/add_todo.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/delete.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/update_todo.models.dart';
 import 'package:todo_list/features/auth/todo/domain/todo_bloc/todo_bloc.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,9 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late DeleteTaskModel deleteTaskModel;
   late AuthBloc _authBloc;
   late TodoBloc _todoBloc;
-  late bool istrue = false;
 
   final TextEditingController _titleController = TextEditingController();
 
@@ -60,19 +62,28 @@ class _HomePageState extends State<HomePage> {
                     final item = state.todoList[index];
 
                     return Dismissible(
-                        key: Key(item.id),
-                        onDismissed: (direction) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('$item deleted')));
+                      key: UniqueKey(),
+                      onDismissed: (direction) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${item.title} deleted'),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                        _deleteTask(context, item.id);
+                      },
+                      background: Container(color: Colors.red),
+                      child: GestureDetector(
+                        onTap: () {
+                          _updateFormDialog(context);
                         },
-                        background: Container(color: Colors.red),
-                        child: SizedBox(
-                          height: 40,
-                          width: 300,
-                          child: Card(
-                            child: 
-                            Text(item.title)),
-                        ));
+                        child: Card(
+                          child: ListTile(
+                            title: Text(item.title),
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 );
               },
@@ -117,17 +128,6 @@ class _HomePageState extends State<HomePage> {
     _authBloc.add(AuthLogoutEvent());
   }
 
-  Widget _buildTodoItems(String title) {
-    return SizedBox(
-      width: 100,
-      child: Card(
-        child: ListTile(
-          title: Text(title),
-        ),
-      ),
-    );
-  }
-
   Future _displayAddDialog(BuildContext context) async {
     return showDialog(
         context: context,
@@ -151,6 +151,45 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   _addTask(context);
                   Navigator.of(context).pop();
+                  _titleController.clear();
+                },
+              ),
+              ElevatedButton(
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  Future _updateFormDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Update Task'),
+            content: Column(
+              children: [
+                TextField(
+                  controller: _titleController,
+                  autofocus: true,
+                  minLines: 3,
+                  maxLines: 15,
+                  decoration: const InputDecoration(hintText: 'Title'),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: const Text('Update'),
+                onPressed: () {
+                  //todo update
+                  _updateTask(context);
+                  Navigator.of(context).pop();
+                  _titleController.clear();
                 },
               ),
               ElevatedButton(
@@ -168,6 +207,20 @@ class _HomePageState extends State<HomePage> {
     _todoBloc.add(
       AddTodoEvent(
         addtodoModel: AddTodoModel(title: _titleController.text),
+      ),
+    );
+  }
+
+  void _updateTask(BuildContext context) {
+    _todoBloc.add(UpdateTodoEvent(
+      updateTodoModel: UpdateTodoModel(id: '', title: _titleController.text),
+    ));
+  }
+
+  void _deleteTask(BuildContext context, String id) {
+    _todoBloc.add(
+      DeleteTodoEvent(
+        deleteTaskModel: DeleteTaskModel(id: id),
       ),
     );
   }

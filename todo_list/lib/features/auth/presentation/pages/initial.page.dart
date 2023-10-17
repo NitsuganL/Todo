@@ -28,11 +28,12 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-        bloc: _authBloc,
-        listener: _authListener,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ));
+      bloc: _authBloc,
+      listener: _authListener,
+      child: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 
   //Listeners
@@ -43,12 +44,14 @@ class _InitialPageState extends State<InitialPage> {
             state.stateStatus == StateStatus.loaded) {
       ///proceed to loginpage
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => BlocProvider.value(
-                    value: _authBloc,
-                    child: const LoginPage(),
-                  )));
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: _authBloc,
+            child: const LoginPage(),
+          ),
+        ),
+      );
       return;
     }
 
@@ -58,15 +61,12 @@ class _InitialPageState extends State<InitialPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MultiBlocProvider(
-            providers: [
-              BlocProvider<AuthBloc>(
-                create: (BuildContext context) => diContainer.authBloc
-              ),
-              BlocProvider<TodoBloc>(
+          builder: (context) => MultiBlocProvider(providers: [
+            BlocProvider<AuthBloc>(
+                create: (BuildContext context) => diContainer.authBloc),
+            BlocProvider<TodoBloc>(
                 create: (BuildContext context) => diContainer.todoBloc)
-          ], child: const HomePage()
-          ),
+          ], child: const HomePage()),
         ),
       );
       return;

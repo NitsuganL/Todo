@@ -6,18 +6,23 @@ sealed class TodoEvent {}
 class AddTodoEvent extends TodoEvent {
   final AddTodoModel addtodoModel;
 
-  AddTodoEvent({required this.addtodoModel});
+  AddTodoEvent({
+    required this.addtodoModel,
+  });
 }
 
 class UpdateTodoEvent extends TodoEvent {
-  final String id;
-  final TodoModel1 todoModel;
+  final UpdateTodoModel updateTodoModel;
 
-  UpdateTodoEvent({required this.id, required this.todoModel});
+  UpdateTodoEvent({
+    required this.updateTodoModel,
+  });
 }
 
 class DeleteTodoEvent extends TodoEvent {
-  final TodoModel1 todoModel;
+  final DeleteTaskModel deleteTaskModel;
 
-  DeleteTodoEvent({required this.todoModel});
+  DeleteTodoEvent({
+    required this.deleteTaskModel,
+  });
 }

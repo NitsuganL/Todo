@@ -2,7 +2,9 @@ import 'package:appwrite/appwrite.dart';
 import 'package:dartz/dartz.dart';
 import 'package:todo_list/config.dart';
 import 'package:todo_list/features/auth/todo/domain/models/add_todo.model.dart';
-import 'package:todo_list/features/auth/todo/domain/models/todo.models.dart';
+import 'package:todo_list/features/auth/todo/domain/models/delete.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/update_todo.models.dart';
+// import 'package:todo_list/features/auth/todo/domain/models/todo.models.dart';
 
 class TodoRemoteDatasource {
   late Databases _databases;
@@ -27,20 +29,45 @@ class TodoRemoteDatasource {
     return docs.$id;
   }
 
-  Future<Unit> updateTask(String id, TodoModel1 todoModel) async {
-    await _databases.updateDocument(
+  Future<Unit> deleteTask(DeleteTaskModel deleteTaskModel) async {
+    
+    await _databases.deleteDocument(
         databaseId: Config.userdbId,
         collectionId: Config.todoTitleID,
-        documentId: id,
+        documentId: deleteTaskModel.id
+      );
+
+    return unit;
+  }
+
+  Future<String> updateTodoModel(UpdateTodoModel updateTodoModel) async {
+    final doc = await _databases.updateDocument(
+        databaseId: Config.userdbId,
+        collectionId: Config.todoTitleID,
+        documentId: updateTodoModel.id,
         data: {
-          'id': id,
-          'title': todoModel.title,
+          'id': updateTodoModel.id,
+          'title': updateTodoModel.title,
           'createdAt': DateTime.now().toIso8601String(),
           'updatedAt': DateTime.now().toIso8601String()
         });
 
-    return unit;
+    return doc.$id;
   }
+  // Future<Unit> updateTask(String taskId, UpdateTodoModel todoModel) async {
+  //   await _databases.updateDocument(
+  //       databaseId: Config.userdbId,
+  //       collectionId: Config.todoTitleID,
+  //       documentId: taskId,
+  //       data: {
+  //         'id': taskId,
+  //         'title': todoModel.title,
+  //         'createdAt': DateTime.now().toIso8601String(),
+  //         'updatedAt': DateTime.now().toIso8601String()
+  //       });
+
+  //   return unit;
+  // }
 
   // Future<TodoModel1> getIdTask() async {
   //   final documents = await _databases.getDocument(
@@ -52,12 +79,12 @@ class TodoRemoteDatasource {
   //   return TodoModel1.fromJson(documents.data);
   // }
 
-  Future<TodoModel1> deleteTask(String id) async {
-    final documents = await _databases.deleteDocument(
-        databaseId: Config.userdbId,
-        collectionId: Config.todoTitleID,
-        documentId: id);
+  // Future<UpdateTodoModel> deleteTask(String id) async {
+  //   final documents = await _databases.deleteDocument(
+  //       databaseId: Config.userdbId,
+  //       collectionId: Config.todoTitleID,
+  //       documentId: id);
 
-    return TodoModel1.fromJson(documents.data);
-  }
+  //   return UpdateTodoModel.fromJson(documents.data);
+  // }
 }
