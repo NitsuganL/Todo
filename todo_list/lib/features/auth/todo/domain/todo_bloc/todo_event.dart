@@ -26,3 +26,11 @@ class DeleteTodoEvent extends TodoEvent {
     required this.deleteTaskModel,
   });
 }
+
+class GetTodoEvent extends TodoEvent {
+    
+  }
+
+class CheckedEvent extends TodoEvent{
+  
+}

@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, prefer_const_constructors_in_immutables
 
 part of 'todo_bloc.dart';
 
@@ -7,15 +7,14 @@ class TodoState {
   final List<TodoModel> todoList;
   final StateStatus stateStatus;
   final String? errorMessage;
-  bool? isDone;
-  bool? isDeleted;
+  bool? isChecked;
 
-  TodoState(
-      {required this.todoList,
-      required this.stateStatus,
-      this.errorMessage,
-      this.isDone,
-      this.isDeleted});
+  TodoState({
+    required this.todoList,
+    required this.stateStatus,
+    this.errorMessage,
+    this.isChecked,
+  });
 
   factory TodoState.initial() =>
       TodoState(stateStatus: StateStatus.initial, todoList: const []);
@@ -24,14 +23,13 @@ class TodoState {
     List<TodoModel>? todoList,
     StateStatus? stateStatus,
     String? errorMessage,
-    bool? isDone,
-    bool? isDeleted,
+    bool? isChecked,
   }) {
     return TodoState(
-        todoList: todoList ?? this.todoList,
-        stateStatus: stateStatus ?? this.stateStatus,
-        errorMessage: errorMessage ?? this.errorMessage,
-        isDone: isDone ?? false,
-        isDeleted: isDeleted ?? false);
+      todoList: todoList ?? this.todoList,
+      stateStatus: stateStatus ?? this.stateStatus,
+      errorMessage: errorMessage ?? this.errorMessage,
+      isChecked: isChecked ?? false
+    );
   }
 }

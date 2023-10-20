@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:todo_list/features/auth/todo/data/datasource/todo_remote.datasource.dart';
 import 'package:todo_list/features/auth/todo/domain/models/add_todo.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/create_todo.model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/delete.model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/update_todo.models.dart';
 
@@ -35,7 +36,18 @@ class TodoRepository {
     }
   }
 
-//not done, need to add on bloc/event/state
+  Future<Either<String, List<TodoModel>>> getTaskRepo() async {
+    try {
+      final result = await _todoRemoteDatesource.getTask();
+      // if (result != result.isEmpty) {
+      //   await _todoRemoteDatesource.getTask();
+      // }
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
   Future<Either<String, Unit>> deleteTaskRepo(
       DeleteTaskModel deleteTaskModel) async {
     try {

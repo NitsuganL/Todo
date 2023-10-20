@@ -26,11 +26,29 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         final currentTodoList = state.todoList;
         emit(state.copyWith(stateStatus: StateStatus.loaded, todoList: [
           ...currentTodoList,
-          TodoModel(id: todoId, title: event.addtodoModel.title)
+          TodoModel(
+              id: todoId,
+              title: event.addtodoModel.title,
+              description: event.addtodoModel.description)
         ]));
       });
     });
+    on<GetTodoEvent>((event, emit) async {
+      emit(state.copyWith(stateStatus: StateStatus.loading));
+      final Either<String, List<TodoModel>> result = await todoRepository.getTaskRepo();
+      result.fold((error) {
+        emit(state.copyWith(
+            stateStatus: StateStatus.error, errorMessage: error));
+        emit(state.copyWith(stateStatus: StateStatus.loaded));
+      }, (todoList) {
+        emit(state.copyWith(
+          stateStatus: StateStatus.loaded,
+          todoList: todoList,
+        ));
+      });
+    });
     on<UpdateTodoEvent>((event, emit) async {
+      emit(state.copyWith(stateStatus: StateStatus.loading));
       final Either<String, String> result =
           await todoRepository.updateTaskRepo(event.updateTodoModel);
 
@@ -39,14 +57,18 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
             stateStatus: StateStatus.error, errorMessage: error));
       }, (todoId) {
         final currentTodoList = state.todoList;
+        TodoModel(
+            id: event.updateTodoModel.id,
+            title: event.updateTodoModel.title,
+            description: event.updateTodoModel.description);
         emit(state.copyWith(stateStatus: StateStatus.loaded, todoList: [
           ...currentTodoList,
-          //Kuwangan
         ]));
       });
     });
 
     on<DeleteTodoEvent>((event, emit) async {
+      emit(state.copyWith(stateStatus: StateStatus.loading));
       final Either<String, Unit> result =
           await todoRepository.deleteTaskRepo(event.deleteTaskModel);
 
@@ -57,7 +79,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         emit(state.copyWith(stateStatus: StateStatus.loaded));
       }, (success) {
         final currentDeleteList = state.todoList;
-        currentDeleteList.removeWhere((TodoModel e) => e.id == event.deleteTaskModel.id);
+        currentDeleteList
+            .removeWhere((TodoModel e) => e.id == event.deleteTaskModel.id);
         emit(state.copyWith(
           stateStatus: StateStatus.loaded,
           todoList: [
@@ -66,20 +89,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         ));
       });
     });
-
-    // on<UpdateTodoEvent>((event, emit) async {
-    //   final Either<String, TodoModel1> result =
-    //       await todoRepository.updateTaskRepo(event.id, event.todoModel);
-
-    //   result.fold((error) {
-    //     emit(state.copyWith(
-    //         stateStatus: StateStatus.error, errorMessage: error));
-
-    //     emit(state.copyWith(stateStatus: StateStatus.loaded));
-    //   }, (todoModel) {
-    //     emit(state.copyWith(
-    //         stateStatus: StateStatus.loaded, todoModel: todoModel));
-    //   });
-    // });
+    on<CheckedEvent>((event, emit) {
+      if (state.isChecked == true) {
+        emit(state.copyWith(isChecked: true));
+      } else {
+        emit(state.copyWith(isChecked: false));
+      }
+    });
   }
 }

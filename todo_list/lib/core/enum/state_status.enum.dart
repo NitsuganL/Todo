@@ -1,3 +1,3 @@
 enum StateStatus {
-  initial, loading, error, loaded
+  initial, loading, error, loaded, isEmpty
 }

@@ -5,6 +5,8 @@ import 'package:todo_list/core/global_widgets/snackbar.widget.dart';
 import 'package:todo_list/core/utils/guard.dart';
 import 'package:todo_list/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:todo_list/features/auth/domain/models/login_model.dart';
+import 'package:todo_list/core/dependency_injection/di_container.dart';
+import 'package:todo_list/features/auth/todo/domain/todo_bloc/todo_bloc.dart';
 import 'register.dart';
 import 'home.dart';
 
@@ -19,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey();
+  final DIContainer diContainer = DIContainer();
 
   late AuthBloc _authBloc;
 
@@ -188,11 +191,13 @@ class _LoginPageState extends State<LoginPage> {
       SnackBarUtils.defualtSnackBar('Success!', context);
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute<void>(
-              builder: (context) => BlocProvider.value(
-                    value: _authBloc,
-                    child: const HomePage(),
-                  )),
+          MaterialPageRoute(
+              builder: (context) => MultiBlocProvider(providers: [
+                    BlocProvider<AuthBloc>(
+                        create: (BuildContext context) => diContainer.authBloc),
+                    BlocProvider<TodoBloc>(
+                        create: (BuildContext context) => diContainer.todoBloc)
+                  ], child: const HomePage())),
           ModalRoute.withName('/'));
     }
   }
