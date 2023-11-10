@@ -7,29 +7,29 @@ class TodoState {
   final List<TodoModel> todoList;
   final StateStatus stateStatus;
   final String? errorMessage;
-  bool? isChecked;
+  final bool isUpdated;
 
   TodoState({
     required this.todoList,
     required this.stateStatus,
     this.errorMessage,
-    this.isChecked,
+    required this.isUpdated
   });
 
   factory TodoState.initial() =>
-      TodoState(stateStatus: StateStatus.initial, todoList: const []);
+      TodoState(stateStatus: StateStatus.initial, todoList: const [], isUpdated: false);
 
   TodoState copyWith({
     List<TodoModel>? todoList,
     StateStatus? stateStatus,
     String? errorMessage,
-    bool? isChecked,
+    bool? isUpdated
   }) {
     return TodoState(
       todoList: todoList ?? this.todoList,
       stateStatus: stateStatus ?? this.stateStatus,
       errorMessage: errorMessage ?? this.errorMessage,
-      isChecked: isChecked ?? false
+      isUpdated: isUpdated ?? this.isUpdated
     );
   }
 }

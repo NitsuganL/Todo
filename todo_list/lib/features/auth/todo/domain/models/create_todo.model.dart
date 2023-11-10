@@ -2,7 +2,7 @@ class TodoModel {
   final String id;
   final String title;
   final String description;
-  bool? isChecked;
+  bool isChecked;
 
   TodoModel(
       {required this.id,
@@ -16,6 +16,7 @@ class TodoModel {
       id: json['id'],
       title: json['title'],
       description: json['description'],
+      isChecked: json['isChecked']
     );
   }
 }

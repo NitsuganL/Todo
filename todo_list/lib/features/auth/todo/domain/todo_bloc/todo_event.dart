@@ -27,10 +27,12 @@ class DeleteTodoEvent extends TodoEvent {
   });
 }
 
-class GetTodoEvent extends TodoEvent {
-    
-  }
+class GetTodoEvent extends TodoEvent {}
 
-class CheckedEvent extends TodoEvent{
-  
+class CheckedEvent extends TodoEvent {
+  final CheckTodoModel checkTodoModel;
+
+  CheckedEvent({
+    required this.checkTodoModel
+  });
 }

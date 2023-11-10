@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:todo_list/features/auth/todo/data/datasource/todo_remote.datasource.dart';
 import 'package:todo_list/features/auth/todo/domain/models/add_todo.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/check_model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/create_todo.model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/delete.model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/update_todo.models.dart';
@@ -39,9 +40,6 @@ class TodoRepository {
   Future<Either<String, List<TodoModel>>> getTaskRepo() async {
     try {
       final result = await _todoRemoteDatesource.getTask();
-      // if (result != result.isEmpty) {
-      //   await _todoRemoteDatesource.getTask();
-      // }
       return Right(result);
     } catch (e) {
       return Left(e.toString());
@@ -59,46 +57,14 @@ class TodoRepository {
     }
   }
 
-  //Each CRUD operation have it's own model
-  //add task model done
-  // create a model for delete and update
-  //delete and update need rework
+  Future<Either<String, Unit>> checkTaskRepo(
+      CheckTodoModel checkTodoModel) async {
+    try {
+    await _todoRemoteDatesource.checkTodoModel(checkTodoModel);
 
-  //need rework
-  // Future<Either<String, TodoModel1>> updateTaskRepo(
-  //     String id, TodoModel1 todoModel) async {
-  //   try {
-  //     await _todoRemoteDatesource.updateTask(id, todoModel);
-
-  //     return Right(todoModel);
-  //   } catch (e) {
-  //     return Left(e.toString());
-  //   }
-  // }
-
-  //need rework
-  // Future<Either<String, TodoModel1>> getIdRepo(String id) async {
-  //   final TodoModel1 todoModel = await _todoRemoteDatesource.getIdTask(id);
-
-  //   try {
-  //     await _todoRemoteDatesource.getIdTask(id);
-
-  //     return Right(todoModel);
-  //   } catch (e) {
-  //     return Left(e.toString());
-  //   }
-  // }
-
-  //need rework
-  // Future<Either<String, TodoModel1>> deleteTaskRepo(String id) async {
-  //   final TodoModel1 todoModel = await _todoRemoteDatesource.deleteTask(id);
-
-  //   try {
-  //     await _todoRemoteDatesource.deleteTask(id);
-
-  //     return Right(todoModel);
-  //   } catch (e) {
-  //     return Left(e.toString());
-  //   }
-  // }
+      return const Right(unit);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
 }

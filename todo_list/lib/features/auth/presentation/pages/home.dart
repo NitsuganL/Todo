@@ -5,6 +5,7 @@ import 'package:todo_list/core/global_widgets/snackbar.widget.dart';
 import 'package:todo_list/features/auth/domain/bloc/auth/auth_bloc.dart';
 import 'package:todo_list/features/auth/presentation/pages/login.dart';
 import 'package:todo_list/features/auth/todo/domain/models/add_todo.model.dart';
+import 'package:todo_list/features/auth/todo/domain/models/check_model.dart';
 import 'package:todo_list/features/auth/todo/domain/models/delete.model.dart';
 import 'package:todo_list/features/auth/todo/domain/todo_bloc/todo_bloc.dart';
 import 'package:todo_list/features/auth/todo/presentation/todo_form.dart';
@@ -47,99 +48,121 @@ class _HomePageState extends State<HomePage> {
           bloc: _todoBloc,
           listener: _todoListener,
           builder: (context, state) {
+            if (state.isUpdated) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
             return WillPopScope(
               onWillPop: () async => false,
               child: Scaffold(
                 appBar: AppBar(
                   leading: const Icon(Icons.home),
+                  titleTextStyle: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple.shade400),
+                  backgroundColor: Colors.purple.shade200,
                   title: const Text('Home'),
                   actions: <Widget>[
                     IconButton(
                         onPressed: _logout, icon: const Icon(Icons.logout))
                   ],
                 ),
-                body: ListView.builder(
-                  itemCount: state.todoList.length,
-                  itemBuilder: (context, index) {
-                    final item = state.todoList[index];
-                    return Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.endToStart,
-                      confirmDismiss: (direction) {
-                        return showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Delete Confirmation!'),
-                              content: Text(
-                                  'Are you sure you want to delete ${item.title}?'),
-                              actions: <Widget>[
-                                ElevatedButton(
-                                    onPressed: () {
-                                      _deleteTask(context, item.id);
-                                      Navigator.of(context).pop();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content:
-                                              Text('${item.title} deleted'),
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text('Delete')),
-                                ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Cancel'))
-                              ],
-                            );
-                          },
-                        );
-                        // _displayConfirmDelete(context, item.title, item.id);
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        child: const Padding(
-                          padding: EdgeInsets.all(15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [Icon(Icons.delete), Text('Delete')],
+                body: Builder(builder: (context) {
+                  if (state.stateStatus == StateStatus.loading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: state.todoList.length,
+                    itemBuilder: (context, index) {
+                      final item = state.todoList[index];
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) {
+                          return showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Delete Confirmation!'),
+                                content: Text(
+                                    'Are you sure you want to delete ${item.title}?'),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        _deleteTask(context, item.id);
+                                        Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text('${item.title} deleted'),
+                                            duration:
+                                                const Duration(seconds: 2),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Delete')),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Cancel'))
+                                ],
+                              );
+                            },
+                          );
+                          // _displayConfirmDelete(context, item.title, item.id);
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: const Padding(
+                            padding: EdgeInsets.all(15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [Icon(Icons.delete), Text('Delete')],
+                            ),
                           ),
                         ),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(
-                                value: _todoBloc,
-                                child: MyFormPage(
-                                  todoModel: item,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: _todoBloc,
+                                  child: MyFormPage(
+                                    todoModel: item,
+                                  ),
                                 ),
                               ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Card(
+                              child: ListTile(
+                                title: Text(item.title),
+                                subtitle: Text(item.description),
+                                trailing: Checkbox(
+                                    value: item.isChecked,
+                                    onChanged: (bool? newIsChecked) {
+                                      _checkListener(context, item.id,
+                                          newIsChecked ?? false);
+                                    }),
+                              ),
                             ),
-                          );
-                        },
-                        child: Card(
-                          child: ListTile(
-                            title: Text(item.title),
-                            subtitle: Text(item.description),
-                            trailing: Checkbox(
-                                value: item.isChecked,
-                                onChanged: (bool? newIsChecked) {
-                                  item.isChecked = newIsChecked!;
-                                  _checkListener(newIsChecked);
-                                }),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                }),
                 floatingActionButton: FloatingActionButton(
+                  backgroundColor: Colors.purple.shade200,
                   onPressed: () {
                     _displayAddDialog(context);
                   },
@@ -173,12 +196,10 @@ class _HomePageState extends State<HomePage> {
 
   void _todoListener(BuildContext context, TodoState state) {
     if (state.stateStatus == StateStatus.error) {
+      const Center(
+              child: CircularProgressIndicator());
       SnackBarUtils.defualtSnackBar(state.errorMessage, context);
     }
-  }
-
-  void _checkListener(bool isChecked) {
-    _todoBloc.add(CheckedEvent());
   }
 
   void _logout() {
@@ -224,6 +245,10 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: <Widget>[
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple.shade200,
+                  foregroundColor: Colors.purple.shade400,
+                ),
                 child: const Text('ADD'),
                 onPressed: () {
                   _addTask(context);
@@ -233,6 +258,10 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple.shade200,
+                  foregroundColor: Colors.purple.shade400,
+                ),
                 child: const Text('CANCEL'),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -251,6 +280,11 @@ class _HomePageState extends State<HomePage> {
             description: _descriptionController.text),
       ),
     );
+  }
+
+  void _checkListener(BuildContext context, String id, bool isChecked) {
+    _todoBloc.add(CheckedEvent(
+        checkTodoModel: CheckTodoModel(id: id, isChecked: isChecked)));
   }
 
   void _deleteTask(BuildContext context, String id) {
